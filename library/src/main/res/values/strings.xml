@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Library</string>
+    <drawable name="divider">#f2f2f2</drawable>
+</resources>
