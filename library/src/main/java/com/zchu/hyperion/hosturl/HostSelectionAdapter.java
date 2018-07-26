@@ -1,8 +1,10 @@
 package com.zchu.hyperion.hosturl;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class HostSelectionAdapter extends BaseAdapter {
     private ArrayList<String> data;
@@ -23,14 +26,14 @@ public class HostSelectionAdapter extends BaseAdapter {
     private SharedPreferences preferences;
     private int colorAccent;
 
-    public HostSelectionAdapter(Context context, SharedPreferences preferences,ArrayList<String> data) {
+    public HostSelectionAdapter(Context context, SharedPreferences preferences, ArrayList<String> data) {
         this.context = context;
-        this.preferences=preferences;
+        this.preferences = preferences;
         this.data = data;
         layoutInflater = LayoutInflater.from(context);
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.colorAccent, typedValue, true);
-        colorAccent=typedValue.data;
+        colorAccent = typedValue.data;
     }
 
     @Override
@@ -60,9 +63,17 @@ public class HostSelectionAdapter extends BaseAdapter {
         if (isSelected(position)) {
             rb_check.setChecked(true);
             tv_host_url.setTextColor(colorAccent);
+            view.setOnLongClickListener(null);
         } else {
             tv_host_url.setTextColor(Color.GRAY);
             rb_check.setChecked(false);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    showDeleteDialog(position);
+                    return true;
+                }
+            });
         }
         rb_check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -82,6 +93,27 @@ public class HostSelectionAdapter extends BaseAdapter {
             }
         });
         return view;
+    }
+
+    private void showDeleteDialog(final int position) {
+        new AlertDialog.Builder(context)
+                .setMessage("确定要删除 (" + getItem(position) + ")  该主机地址吗？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        data.remove(position);
+                        preferences
+                                .edit()
+                                .putStringSet("list", new HashSet<>(data))
+                                .apply();
+                        if(position<selectedPosition) {
+                            selectedPosition = -1;
+                        }
+                        notifyDataSetChanged();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private boolean isSelected(int position) {

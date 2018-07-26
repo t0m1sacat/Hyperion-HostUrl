@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -48,7 +48,7 @@ publish {
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'hyperion-hosturl'
-    publishVersion = '1.0.0'
+    publishVersion = '1.0.1'
     desc = 'Hyperion Plugin for host url'
     website = 'https://github.com/z-chu'
 }
