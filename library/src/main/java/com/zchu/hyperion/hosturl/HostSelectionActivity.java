@@ -132,7 +132,8 @@ public class HostSelectionActivity extends AppCompatActivity {
                 }
             }
         });
-
+        editText.setText("https://");
+        editText.setSelection(editText.getText().length());
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("添加主机地址")
                 .setView(editText)

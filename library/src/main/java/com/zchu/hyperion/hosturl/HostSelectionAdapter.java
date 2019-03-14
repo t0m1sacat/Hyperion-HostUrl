@@ -1,5 +1,7 @@
 package com.zchu.hyperion.hosturl;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -13,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -63,7 +66,13 @@ public class HostSelectionAdapter extends BaseAdapter {
         if (isSelected(position)) {
             rb_check.setChecked(true);
             tv_host_url.setTextColor(colorAccent);
-            view.setOnLongClickListener(null);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    copy(position);
+                    return true;
+                }
+            });
         } else {
             tv_host_url.setTextColor(Color.GRAY);
             rb_check.setChecked(false);
@@ -97,23 +106,44 @@ public class HostSelectionAdapter extends BaseAdapter {
 
     private void showDeleteDialog(final int position) {
         new AlertDialog.Builder(context)
-                .setMessage("确定要删除 (" + getItem(position) + ")  该主机地址吗？")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                .setItems(new String[]{"复制", "删除"}, new DialogInterface.OnClickListener() {
+
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        data.remove(position);
-                        preferences
-                                .edit()
-                                .putStringSet("list", new HashSet<>(data))
-                                .apply();
-                        if(position<selectedPosition) {
-                            selectedPosition = -1;
+                        if (which == 0) {
+                            copy(position);
+                        } else {
+                            delete(position);
                         }
-                        notifyDataSetChanged();
                     }
                 })
-                .setNegativeButton("取消", null)
                 .show();
+    }
+
+    private void copy(int position) {
+        String url = data.get(position);
+        ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboardManager != null) {
+            ClipData clipData = ClipData
+                    .newPlainText(
+                            "host",
+                            url
+                    );
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(context,"已复制",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void delete(int position) {
+        data.remove(position);
+        preferences
+                .edit()
+                .putStringSet("list", new HashSet<>(data))
+                .apply();
+        if (position < selectedPosition) {
+            selectedPosition = -1;
+        }
+        notifyDataSetChanged();
     }
 
     private boolean isSelected(int position) {
