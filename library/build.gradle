@@ -48,7 +48,7 @@ publish {
     userOrg = 'zchu'
     groupId = 'com.zchu'
     artifactId = 'hyperion-hosturl'
-    publishVersion = '1.0.1'
+    publishVersion = '1.0.2'
     desc = 'Hyperion Plugin for host url'
     website = 'https://github.com/z-chu'
 }
